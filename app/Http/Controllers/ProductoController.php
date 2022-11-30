@@ -210,7 +210,7 @@ class ProductoController extends Controller
 
 
     public function confirm($id){
-        $producto = Producto::find($id);
+        $producto = Producto::with(['getMarca','getCategoria'])->find($id);
         return view('productoDelete', [ 'producto' => $producto ]);
     }
 
@@ -220,9 +220,27 @@ class ProductoController extends Controller
      * @param  \App\Models\Producto  $producto
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Producto $producto)
+    public function destroy(Request $request)
     {
         //
+        $prdNombre = $request->prdNombre;
+        try{
+            $idProducto = $request->idProducto;
+            Producto::destroy($idProducto);
+            return redirect('/productos')
+                ->with(
+                    [
+                        'mensaje'=>'Producto: '.$prdNombre.' eliminado correctamente.',
+                        'css'=>'success'
+                    ]);
+        }catch(\Throwable $th){
+            return redirect('/productos')
+                ->with(
+                    [
+                        'mensaje'=>'No se pudo eliminar el producto: '.$prdNombre,
+                        'css'=>'danger'
+                    ]);
+        }
 
     }
 }
